@@ -252,6 +252,25 @@ section {
   color: var(--accent);
 }
 
+/* Make card links look like normal cards (remove default blue/underline and make whole card clickable) */
+.card-link {
+  display: block; /* ensure the anchor fills the grid cell */
+  text-decoration: none; /* remove underline */
+  color: inherit; /* use the same text color as surrounding content */
+}
+
+/* Keep the card hover effect when wrapped by the anchor */
+.card-link .card {
+  display: block;
+}
+
+/* Accessible focus state for keyboard users */
+.card-link:focus-visible {
+  outline: 3px solid rgba(59,91,219,0.15);
+  outline-offset: 6px;
+  border-radius: 12px;
+}
+
 /* ── SKILLS ── */
 .skill-grid {
   display: grid;
