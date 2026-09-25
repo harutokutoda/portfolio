@@ -1,6 +1,6 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
-  "name": "contact-worker",
+  "name": "portfolio",
   "compatibility_date": "2026-07-07",
   "observability": {
     "enabled": true
