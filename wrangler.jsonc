@@ -1,5 +1,6 @@
 {
+  "$schema": "node_modules/wrangler/config-schema.json",
   "name": "contact-worker",
   "main": "index.js",
-  "compatibility_date": "2024-01-01"
+  "compatibility_date": "2024-09-23"
 }
