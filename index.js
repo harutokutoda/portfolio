@@ -46,7 +46,7 @@ export default {
       // DEBUG: tell us if the API key variable is missing
       if (!env.RESEND_API_KEY) {
         return new Response(
-          JSON.stringify({ error: "DEBUG: RESEND_API_KEY is not set on this Worker." }),
+          JSON.stringify({ error: "DEBUG: RESEND_API_KEY is not set. Variables this Worker can see: [" + Object.keys(env).join(", ") + "]" }),
           { status: 500, headers: jsonHeaders }
         );
       }
