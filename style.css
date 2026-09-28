@@ -590,4 +590,13 @@ body.is-loaded nav {
     filter: none;
     transition: none;
   }
+}
+
+/* ── Turnstile + info status ── */
+#turnstile-box { min-height: 65px; }
+.form-status--info {
+  color: var(--accent);
+  background: var(--acc-lt);
+  border-color: #d6defc;
     }
+  
