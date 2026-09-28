@@ -20,6 +20,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
+  <script src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit" async defer></script>
   <script src="script.js" defer></script>
 </head>
 <body>
@@ -243,6 +244,12 @@
             <input type="text" id="company" name="company" tabindex="-1" autocomplete="off" />
           </div>
 
+          <!-- Cloudflare Turnstile verification checkbox -->
+          <div class="form-field form-field--full">
+            <div id="turnstile-box"></div>
+            <span class="form-field__error" data-error-for="turnstile"></span>
+          </div>
+
           <div class="form-field form-field--full">
             <button type="submit" id="submit-btn" class="btn btn-solid">
               <span class="btn-submit__label">Send message</span>
@@ -271,4 +278,4 @@
 
 </body>
               </html>
-                                                          
+              
