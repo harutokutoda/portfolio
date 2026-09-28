@@ -345,3 +345,249 @@ button:focus-visible {
     height: 120px;
   }
 }
+
+/* ── CONTACT FORM (direct message) ── */
+.clink-toggle {
+  font-family: 'Inter', sans-serif;
+  cursor: pointer;
+}
+.clink-toggle[aria-expanded="true"] {
+  background: var(--acc-lt);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.dm-panel {
+  display: grid;
+  grid-template-rows: 0fr;
+  opacity: 0;
+  transition: grid-template-rows .35s ease, opacity .3s ease;
+  margin-top: 22px;
+}
+.dm-panel.is-open {
+  grid-template-rows: 1fr;
+  opacity: 1;
+}
+.dm-panel > .contact-form {
+  overflow: hidden;
+}
+
+.contact-form {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  max-width: 600px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  padding: 26px;
+}
+
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.form-field--full { grid-column: 1 / -1; }
+.form-field--honeypot {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.form-field label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--muted);
+}
+
+.form-field input,
+.form-field textarea {
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  color: var(--text);
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 11px 13px;
+  outline: none;
+  transition: border-color .2s, box-shadow .2s;
+}
+.form-field textarea {
+  resize: vertical;
+  min-height: 130px;
+  line-height: 1.6;
+}
+.form-field input::placeholder,
+.form-field textarea::placeholder {
+  color: var(--muted);
+  opacity: .7;
+}
+.form-field input:focus-visible,
+.form-field textarea:focus-visible {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--acc-lt);
+}
+.form-field input.is-invalid,
+.form-field textarea.is-invalid {
+  border-color: #d9483b;
+}
+.form-field__error {
+  min-height: 1.1em;
+  font-size: 12px;
+  color: #d9483b;
+}
+
+.btn-submit__spinner {
+  display: none;
+  width: 14px;
+  height: 14px;
+  margin-left: 8px;
+  border: 2px solid rgba(255,255,255,.4);
+  border-top-color: #fff;
+  border-radius: 50%;
+  vertical-align: -2px;
+}
+#submit-btn.is-loading .btn-submit__spinner {
+  display: inline-block;
+  animation: dm-spin .6s linear infinite;
+}
+@keyframes dm-spin { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) {
+  #submit-btn.is-loading .btn-submit__spinner,
+  .dm-panel {
+    animation: none;
+    transition: none;
+  }
+}
+
+.form-status {
+  grid-column: 1 / -1;
+  border-radius: 8px;
+  padding: 11px 14px;
+  font-size: 13px;
+  border: 1px solid transparent;
+}
+.form-status--success {
+  color: #1a7f4a;
+  background: #e9f8ef;
+  border-color: #bfe8cf;
+}
+.form-status--error {
+  color: #b3261e;
+  background: #fdecea;
+  border-color: #f4c5c0;
+}
+
+@media (max-width: 640px) {
+  .contact-form { grid-template-columns: 1fr; padding: 20px; }
+}
+
+/* ── PAGE PRELOADER ── */
+#preloader {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+  background: var(--bg);
+  transition: opacity .5s ease, visibility .5s ease;
+}
+#preloader.is-hidden {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.preloader__mark {
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 600;
+  font-size: 20px;
+  letter-spacing: -0.5px;
+  color: var(--text);
+  animation: preloader-pulse 1.4s ease-in-out infinite;
+}
+
+.preloader__bar {
+  width: 140px;
+  height: 3px;
+  border-radius: 999px;
+  background: var(--border);
+  overflow: hidden;
+}
+.preloader__bar span {
+  display: block;
+  height: 100%;
+  width: 40%;
+  border-radius: 999px;
+  background: var(--accent);
+  animation: preloader-slide 1.1s ease-in-out infinite;
+}
+
+@keyframes preloader-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: .45; }
+}
+@keyframes preloader-slide {
+  0%   { transform: translateX(-100%); }
+  50%  { transform: translateX(140%); }
+  100% { transform: translateX(140%); }
+}
+
+/* Once the loader clears, let the page fade up into place */
+body.is-loaded main,
+body.is-loaded nav {
+  animation: page-fade-in .5s ease both;
+}
+@keyframes page-fade-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .preloader__mark,
+  .preloader__bar span,
+  body.is-loaded main,
+  body.is-loaded nav {
+    animation: none !important;
+  }
+}
+
+/* ── SCROLL REVEAL (.r) ──
+   Fades an element out when it scrolls out of view, and back in
+   as it scrolls into view again. */
+.r {
+  opacity: 0;
+  transform: translateY(64px) scale(.97);
+  filter: blur(6px);
+  transition: opacity .9s cubic-bezier(.22,.61,.36,1),
+              transform .9s cubic-bezier(.22,.61,.36,1),
+              filter .9s cubic-bezier(.22,.61,.36,1);
+  will-change: opacity, transform, filter;
+}
+.r.in-view {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  filter: blur(0);
+}
+/* Stagger project cards so they arrive one after another */
+.cards > .card.r:nth-child(2), .cards > a:nth-child(2) .card.r { transition-delay: .1s; }
+.cards > .card.r:nth-child(3), .cards > a:nth-child(3) .card.r { transition-delay: .2s; }
+.cards > .card.r:nth-child(4), .cards > a:nth-child(4) .card.r { transition-delay: .3s; }
+.cards > .card.r:nth-child(5), .cards > a:nth-child(5) .card.r { transition-delay: .4s; }
+.cards > .card.r:nth-child(6), .cards > a:nth-child(6) .card.r { transition-delay: .5s; }
+
+@media (prefers-reduced-motion: reduce) {
+  .r {
+    opacity: 1;
+    transform: none;
+    filter: none;
+    transition: none;
+  }
+    }
