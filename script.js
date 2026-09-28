@@ -120,45 +120,13 @@
 
 (() => {
   const API_ENDPOINT = "/api/contact";
-
-  /* ---------- Toggle panel ---------- */
+  // Public key from Cloudflare Dashboard → Turnstile → your widget
+  const TURNSTILE_SITE_KEY = "0x4AAAAAAFGPoCCNzJ8elzX1";
+  const DAILY_KEY = "dm_last_sent";
+  const DAY_MS = 24 * 60 * 60 * 1000;
 
   const toggleBtn = document.getElementById("dm-toggle");
   const panel = document.getElementById("dm-panel");
-
-  if (toggleBtn && panel) {
-    toggleBtn.addEventListener("click", () => {
-      const isOpen = toggleBtn.getAttribute("aria-expanded") === "true";
-
-      if (isOpen) {
-        panel.classList.remove("is-open");
-        toggleBtn.setAttribute("aria-expanded", "false");
-        toggleBtn.querySelector(".dm-toggle__label").textContent = "Direct Message";
-        // Wait for the collapse transition before re-hiding from a11y tree
-        panel.addEventListener(
-          "transitionend",
-          () => {
-            if (!panel.classList.contains("is-open")) panel.hidden = true;
-          },
-          { once: true }
-        );
-      } else {
-        panel.hidden = false;
-        // Force layout so the browser registers the 0fr state before animating
-        panel.offsetHeight; // eslint-disable-line no-unused-expressions
-        panel.classList.add("is-open");
-        toggleBtn.setAttribute("aria-expanded", "true");
-        toggleBtn.querySelector(".dm-toggle__label").textContent = "✕ Close";
-        const nameInput = document.getElementById("name");
-        if (nameInput) {
-          setTimeout(() => nameInput.focus(), 350);
-        }
-      }
-    });
-  }
-
-  /* ---------- Form submission ---------- */
-
   const form = document.getElementById("contact-form");
   if (!form) return;
 
@@ -172,6 +140,99 @@
   };
 
   const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+  /* ---------- Turnstile ---------- */
+
+  let widgetId = null;
+  let turnstileToken = "";
+
+  function renderTurnstile(attempt = 0) {
+    if (widgetId !== null) return;
+    const box = document.getElementById("turnstile-box");
+    if (!box) return;
+    if (!window.turnstile) {
+      // Turnstile script still loading — retry for up to ~10s
+      if (attempt < 50) setTimeout(() => renderTurnstile(attempt + 1), 200);
+      return;
+    }
+    widgetId = window.turnstile.render(box, {
+      sitekey: TURNSTILE_SITE_KEY,
+      theme: "light",
+      callback: (token) => {
+        turnstileToken = token;
+        const err = form.querySelector('[data-error-for="turnstile"]');
+        if (err) err.textContent = "";
+      },
+      "expired-callback": () => { turnstileToken = ""; },
+      "error-callback": () => { turnstileToken = ""; },
+    });
+  }
+
+  function resetTurnstile() {
+    turnstileToken = "";
+    if (widgetId !== null && window.turnstile) window.turnstile.reset(widgetId);
+  }
+
+  /* ---------- One message per day (browser side) ---------- */
+
+  function sentToday() {
+    try {
+      const t = Number(localStorage.getItem(DAILY_KEY));
+      return t > 0 && Date.now() - t < DAY_MS;
+    } catch {
+      return false;
+    }
+  }
+
+  function markSent() {
+    try {
+      localStorage.setItem(DAILY_KEY, String(Date.now()));
+    } catch {
+      /* storage blocked — the server-side limit still applies */
+    }
+  }
+
+  function applyLimitState() {
+    if (sentToday()) {
+      setStatus("info", "You've already sent a message today — thanks! Please come back tomorrow.");
+      submitBtn.disabled = true;
+    }
+  }
+
+  /* ---------- Toggle panel ---------- */
+
+  if (toggleBtn && panel) {
+    toggleBtn.addEventListener("click", () => {
+      const isOpen = toggleBtn.getAttribute("aria-expanded") === "true";
+
+      if (isOpen) {
+        panel.classList.remove("is-open");
+        toggleBtn.setAttribute("aria-expanded", "false");
+        toggleBtn.querySelector(".dm-toggle__label").textContent = "Direct Message";
+        panel.addEventListener(
+          "transitionend",
+          () => {
+            if (!panel.classList.contains("is-open")) panel.hidden = true;
+          },
+          { once: true }
+        );
+      } else {
+        panel.hidden = false;
+        panel.offsetHeight; // force layout so the open transition plays
+        panel.classList.add("is-open");
+        toggleBtn.setAttribute("aria-expanded", "true");
+        toggleBtn.querySelector(".dm-toggle__label").textContent = "✕ Close";
+        renderTurnstile();
+        applyLimitState();
+        const nameInput = document.getElementById("name");
+        if (nameInput && !sentToday()) {
+          setTimeout(() => nameInput.focus(), 350);
+        }
+      }
+    });
+  }
+
+  /* ---------- Validation + status helpers ---------- */
 
   function clearFieldErrors() {
     form.querySelectorAll(".form-field__error").forEach((el) => {
@@ -206,6 +267,10 @@
       setFieldError("message", "Message should be at least 10 characters.");
       isValid = false;
     }
+    if (!turnstileToken) {
+      setFieldError("turnstile", "Please complete the verification check.");
+      isValid = false;
+    }
     return isValid;
   }
 
@@ -229,13 +294,21 @@
       : "Send message";
   }
 
+  /* ---------- Submit ---------- */
+
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
     clearStatus();
 
+    // Honeypot — real users never see this field
     const honeypot = form.elements.company;
     if (honeypot && honeypot.value.trim() !== "") {
       form.reset();
+      return;
+    }
+
+    if (sentToday()) {
+      applyLimitState();
       return;
     }
 
@@ -248,6 +321,8 @@
       name: fields.name.value.trim(),
       email: fields.email.value.trim(),
       message: fields.message.value.trim(),
+      company: honeypot ? honeypot.value : "",
+      turnstileToken,
     };
 
     setLoading(true);
@@ -263,26 +338,31 @@
       try {
         data = await response.json();
       } catch {
-        // non-JSON body, fall through
+        /* non-JSON body */
       }
 
       if (!response.ok) {
-        const message =
+        // 429 = the server says this device/network already sent one today
+        if (response.status === 429) markSent();
+        setStatus(
+          "error",
           (data && data.error) ||
-          "Something went wrong on the server. Please try again in a moment.";
-        setStatus("error", message);
+            "Something went wrong on the server. Please try again in a moment."
+        );
+        resetTurnstile();
         return;
       }
 
+      markSent();
       setStatus("success", "Thanks — your message has been sent. I'll reply soon.");
       form.reset();
+      resetTurnstile();
     } catch (err) {
-      setStatus(
-        "error",
-        "Couldn't reach the server. Check your connection and try again."
-      );
+      setStatus("error", "Couldn't reach the server. Check your connection and try again.");
+      resetTurnstile();
     } finally {
       setLoading(false);
+      if (sentToday()) submitBtn.disabled = true;
     }
   });
 
