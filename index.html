@@ -20,8 +20,16 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
+  <script src="script.js" defer></script>
 </head>
 <body>
+
+  <!-- Page preloader: shown until the page has finished loading -->
+  <div id="preloader" aria-hidden="true">
+    <div class="preloader__mark">Pramish</div>
+    <div class="preloader__bar"><span></span></div>
+  </div>
+
 
   <!-- Main navigation -->
   <nav aria-label="Main navigation">
@@ -172,6 +180,84 @@
         <a href="https://x.com/Harutokur" class="clink" target="_blank" rel="noopener">🐦 Twitter / X</a>
         <a href="https://linkedin.com/in/pramish-paudel-295336418" class="clink" target="_blank" rel="noopener">💼 LinkedIn</a>
         <a href="https://harutokutoda.itch.io/" class="clink" target="_blank" rel="noopener">🎮 itch.io</a>
+        <button
+          type="button"
+          id="dm-toggle"
+          class="clink clink-toggle"
+          aria-expanded="false"
+          aria-controls="dm-panel"
+        >
+          <span class="dm-toggle__icon" aria-hidden="true">💬</span>
+          <span class="dm-toggle__label">Direct Message</span>
+        </button>
+      </div>
+
+      <!-- Direct message form (collapsed by default) -->
+      <div id="dm-panel" class="dm-panel" hidden>
+        <form id="contact-form" class="contact-form" novalidate>
+          <div class="form-field">
+            <label for="name">Name</label>
+            <input
+              type="text"
+              id="name"
+              name="name"
+              autocomplete="name"
+              placeholder="Your name"
+              required
+              minlength="2"
+              maxlength="100"
+            />
+            <span class="form-field__error" data-error-for="name"></span>
+          </div>
+
+          <div class="form-field">
+            <label for="email">Email</label>
+            <input
+              type="email"
+              id="email"
+              name="email"
+              autocomplete="email"
+              placeholder="you@example.com"
+              required
+            />
+            <span class="form-field__error" data-error-for="email"></span>
+          </div>
+
+          <div class="form-field form-field--full">
+            <label for="message">Message</label>
+            <textarea
+              id="message"
+              name="message"
+              rows="6"
+              placeholder="Tell me a bit about what you have in mind..."
+              required
+              minlength="10"
+              maxlength="2000"
+            ></textarea>
+            <span class="form-field__error" data-error-for="message"></span>
+          </div>
+
+          <!-- Honeypot field: hidden from real users, bots tend to fill every input -->
+          <div class="form-field form-field--honeypot" aria-hidden="true">
+            <label for="company">Company</label>
+            <input type="text" id="company" name="company" tabindex="-1" autocomplete="off" />
+          </div>
+
+          <div class="form-field form-field--full">
+            <button type="submit" id="submit-btn" class="btn btn-solid">
+              <span class="btn-submit__label">Send message</span>
+              <span class="btn-submit__spinner" aria-hidden="true"></span>
+            </button>
+          </div>
+
+          <div
+            id="form-status"
+            class="form-status"
+            role="status"
+            aria-live="polite"
+            hidden
+          ></div>
+        </form>
       </div>
     </div>
   </section>
@@ -184,4 +270,5 @@
   </footer>
 
 </body>
-</html>
+              </html>
+                                                          
