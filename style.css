@@ -564,17 +564,14 @@ body.is-loaded nav {
    as it scrolls into view again. */
 .r {
   opacity: 0;
-  transform: translateY(64px) scale(.97);
-  filter: blur(6px);
-  transition: opacity .9s cubic-bezier(.22,.61,.36,1),
-              transform .9s cubic-bezier(.22,.61,.36,1),
-              filter .9s cubic-bezier(.22,.61,.36,1);
-  will-change: opacity, transform, filter;
+  transform: translateY(40px);
+  transition: opacity .7s cubic-bezier(.22,.61,.36,1),
+              transform .7s cubic-bezier(.22,.61,.36,1);
+  will-change: opacity, transform;
 }
 .r.in-view {
   opacity: 1;
-  transform: translateY(0) scale(1);
-  filter: blur(0);
+  transform: translateY(0);
 }
 /* Stagger project cards so they arrive one after another */
 .cards > .card.r:nth-child(2), .cards > a:nth-child(2) .card.r { transition-delay: .1s; }
@@ -587,7 +584,6 @@ body.is-loaded nav {
   .r {
     opacity: 1;
     transform: none;
-    filter: none;
     transition: none;
   }
 }
