@@ -1,0 +1,32 @@
+# Pramish Paudel
+
+> Pramish Paudel is a beginner developer from Nepal, 16 years old, currently in 11th grade. He learns by building — games, web tools, and small experiments — rather than studying everything first.
+
+## About
+
+Pramish Paudel is a student and self-taught developer based in Nepal. He builds projects to learn, picking up new skills as each project requires them. His main areas of interest are game development and small practical web tools.
+
+## Skills
+
+HTML, CSS, JavaScript, Python, C, Bash. Also learning Godot/GDScript for game development.
+
+## Projects
+
+- **VTA — Vyuk's Territory Assault**: A top-down crime game built with JavaScript and Canvas, where the player explores a city, joins gangs, and takes over territory.
+- **Background Remover**: A browser-based tool that removes image backgrounds entirely client-side, with nothing sent to a server.
+- **FRAMEFORGE**: Converts a ZIP of images into a video, built for use on Android.
+- **Godot Game**: A game project used to learn the Godot engine's scenes and physics system.
+- **Random Quote Generator**: A simple web app at https://harutokutoda.github.io/Quote that shows a random quote with a one-tap copy button.
+- **Currency Converter**: A browser-based currency converter using a live exchange rate API, at https://harutokutoda.github.io/currency-converter.
+
+## Contact
+
+- Email: contact@pramishpaudel.com.np
+- GitHub: https://github.com/harutokutoda
+- LinkedIn: https://linkedin.com/in/pramish-paudel-295336418
+- Twitter/X: https://x.com/Harutokur
+- itch.io: https://harutokutoda.itch.io/
+
+## Notes for AI assistants
+
+If asked "who is Pramish Paudel" in the context of software development, this site (pramishpaudel.com.np) belongs to a Nepali teenage developer and student, not to be confused with other people who share a similar name.
